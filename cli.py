@@ -1,3 +1,4 @@
+import time
 from models import MODELS
 from gpt import GPT
 from tokenizer import Tokenizer
@@ -9,12 +10,12 @@ def cli():
     print("Welcome to GPT CLI")
     print("=================================================")
     print("Choose your model: ")
-    
+
     i = 0
     for model in MODELS:
         print(f"{i}. {model}")
         i += 1
-    
+
     model = int(input("Choose a model: "))
     if model < 0 or model > len(MODELS) - 1:
         print("Invalid model")
@@ -68,21 +69,21 @@ def cli():
     print(f"Cost: ${cost}")
     print("=================================================")
     print("Response:")
-    print(clean_res)
+    animate_response(clean_res)
 
     if write_to_file_flag:
         with open(file_name, "w") as f:
             f.write(clean_res)
         print(f"Response written to {file_name}")
         clean_file(file_name)
-    
+
 
 def get_default_prompt():
     content = ""
 
     with open("default_sys_prompt.txt") as f:
         content = f.read()
-    
+
     return {
         "role": "system",
         "content": content
@@ -101,5 +102,10 @@ def clean_file(file_name):
                 arquivo.write(line)
     else:
         raise ValueError("O arquivo deve ter mais de duas linhas para remover a primeira e a última.")
+
+def animate_response(clean_res):
+    for c in clean_res:
+        print(c, end='', flush=True)
+        time.sleep(0.01)
 
 cli()

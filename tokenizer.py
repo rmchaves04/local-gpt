@@ -4,6 +4,8 @@ from gpt import GPT
 import tiktoken
 import openai
 
+# TODO: add other models token pricing
+
 class Tokenizer:
     def __init__(self, gpt: GPT):
         self.gpt = gpt
@@ -14,10 +16,10 @@ class Tokenizer:
             "gpt-4-1106-vision-preview": {"input": 0.01, "output": 0.03},
         }
         assert self.gpt.model in self.prices_per_thousand_tokens, "Model not found in the price table."
-    
+
     def get_encoding(self) -> str:
         return tiktoken.encoding_for_model(self.gpt.model)
-    
+
     def tokens_per_string(self, string: str) -> int:
         encoded_str = self.encoding.encode(string)
         return len(encoded_str)
@@ -36,5 +38,5 @@ class Tokenizer:
         return total_cost
 
     def estimate_cost(self):
-        
+
         return (self.tokens_per_prompt() / 1000) * self.prices_per_thousand_tokens[self.gpt.model]["input"]
