@@ -1,5 +1,5 @@
 # Local GPT
-This is a co-owned repository made together with [@Lorenzobattistela](Lorenzobattistela). Everything here is still a WIP.
+This is a co-owned repository made together with [@Lorenzobattistela](https://github.com/Lorenzobattistela). Everything here is still a WIP.
 
 Local GPT is a Python CLI that makes requests to OpenAI's models using their Python package, `openai`.
 
