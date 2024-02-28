@@ -46,11 +46,23 @@ def cli():
     else:
         messages.append(get_default_prompt())
     print("=================================================")
-    print("Write your user prompt:")
-    messages.append({
-        "role": "user",
-        "content": input()
-    })
+    print("Do you want us to read the prompt from a file? [Y/n] (default: n)")
+    read_from_file = input()
+    if read_from_file.lower() == "y":
+        print("Write the file name:")
+        file_name = input()
+        with open(file_name, "r") as f:
+            messages.append({
+                "role": "user",
+                "content": f.read()
+            })
+    else:
+        print("=================================================")
+        print("Write your user prompt:")
+        messages.append({
+            "role": "user",
+            "content": input()
+        })
     print("=================================================")
     gpt = GPT(model, messages)
     tokenizer = Tokenizer(gpt)
