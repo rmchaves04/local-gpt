@@ -7,6 +7,7 @@ Local GPT is a Python CLI that makes requests to OpenAI's models using their Pyt
 - Model selection
 - Cost estimation using `tiktoken`
 - Customizable system prompts (the default prompt is inside `default_sys_prompt.txt`)
+- Reading inputs from files
 - Writing outputs to files
 
 ### Installation guide
@@ -19,6 +20,6 @@ Finally, just run `cli.py` and get started!
 > Currently only the first model (option 0) is working. Prices for the other models need to be added in `tokens.py`.
 
 ### To-do List:
-- Add prices for other models in `tokens.py`
+- Add image input with the vision model
 - Save the chat history in a txt file
 - Implement replies and follow up questions in the context of the original question
