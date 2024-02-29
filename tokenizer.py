@@ -11,9 +11,10 @@ class Tokenizer:
         self.gpt = gpt
         self.encoding = self.get_encoding()
         self.prices_per_thousand_tokens = {
-            "gpt-4-0125-preview": {"input": 0.01, "output": 0.03},
-            "gpt-4-1106-preview": {"input": 0.01, "output": 0.03},
-            "gpt-4-1106-vision-preview": {"input": 0.01, "output": 0.03},
+            "gpt-3.5-turbo-0125": {"input": 0.0005, "output": 0.0015},
+            "gpt-4": {"input": 0.03, "output": 0.06},
+            "gpt-4-turbo-preview": {"input": 0.01, "output": 0.03},
+            "gpt-4-vision-preview": {"input": 0.01, "output": 0.03}
         }
         assert self.gpt.model in self.prices_per_thousand_tokens, "Model not found in the price table."
 
