@@ -2,6 +2,27 @@
 <html>
   <head>
     <title>Simple Form</title>
+    <style>
+      /* Style for the chat messages */
+      .chat-container {
+        overflow-y: scroll; /* Enable vertical scrollbar */
+        height: 300px; /* Set a fixed height */
+        border: 1px solid #ccc; /* Add a border */
+        padding: 10px; /* Add some padding */
+      }
+
+      .message {
+        margin-bottom: 10px; /* Add some spacing between messages */
+      }
+
+      .sender {
+        font-weight: bold; /* Make sender name bold */
+      }
+
+      .content {
+        margin-left: 10px; /* Add some indentation to the content */
+      }
+    </style>
   </head>
   <body>
     <h1>Simple Form</h1>
@@ -12,6 +33,10 @@
         <option value="{{ model }}">{{ model }}</option>
         {% endfor %}
       </select>
+      <br /><br />
+
+      <label for="history"> Feed history for next prompt:</label>
+      <input type="checkbox" id="history" name="history" />
       <br /><br />
 
       <label for="system_prompt">System Prompt:</label>
@@ -30,5 +55,13 @@
 
       <input type="submit" value="Submit" />
     </form>
+    <div class="chat-container">
+      {% for message in message_history %}
+      <div class="message">
+        <span class="sender">{{ message.sender }}:</span>
+        <span class="content">{{ message.content }}</span>
+      </div>
+      {% endfor %}
+    </div>
   </body>
 </html>

@@ -2,11 +2,48 @@
 <html>
   <head>
     <title>Response</title>
+    <style>
+      /* Style for the chat messages */
+      .chat-container {
+        overflow-y: scroll; /* Enable vertical scrollbar */
+        height: 300px; /* Set a fixed height */
+        border: 1px solid #ccc; /* Add a border */
+        padding: 10px; /* Add some padding */
+      }
+
+      .message {
+        margin-bottom: 10px; /* Add some spacing between messages */
+      }
+
+      .sender {
+        font-weight: bold; /* Make sender name bold */
+      }
+
+      .content {
+        margin-left: 10px; /* Add some indentation to the content */
+      }
+    </style>
   </head>
   <body>
     <h1>Response</h1>
-    <textarea rows="6" cols="50" readonly>{{ response }}</textarea>
+    <div class="chat-container">
+      {% for message in message_history %}
+      <div class="message">
+        <span class="sender">{{ message.sender }}:</span>
+        <span class="content">{{ message.content }}</span>
+      </div>
+      {% endfor %}
+    </div>
     <br /><br />
     <p><strong>Cost:</strong> {{ cost }}</p>
+    <textarea id="prompt" name="prompt" rows="4" cols="50" required readonly>
+      {{response}}
+    </textarea>
+    <form action="/" method="get">
+      <input type="submit" value="Go to Home" />
+    </form>
+    <form action="/clean-history" method="get">
+      <input type="submit" value="Clean History" />
+    </form>
   </body>
 </html>
