@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Local GPT</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Response</h1>
+    <div class="chat-container">
+      {% for message in message_history %}
+      <div class="message">
+        <span class="sender">{{ message.sender }}:</span>
+        <span class="content">{{ message.content }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <br /><br />
+    <p><strong>Cost:</strong> {{ cost }}</p>
+    <textarea id="prompt" name="prompt" rows="4" cols="50" required readonly>
+      {{response}}
+    </textarea>
+    <form action="/" method="get">
+      <input type="submit" value="Go to Home" />
+    </form>
+    <form action="/clean-history" method="get">
+      <input type="submit" value="Clean History" />
+    </form>
+  </body>
+</html>
