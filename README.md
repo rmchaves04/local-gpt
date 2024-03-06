@@ -23,3 +23,5 @@ Navigate to the directory and simply execute either `cli.py` or `gui.py`, depend
 ### To-do List:
 - Add image input with the vision model
 - Save the chat history in a `.txt` file
+- Add support for Anthropic models
+- Add response streaming
