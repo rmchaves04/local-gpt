@@ -74,18 +74,24 @@ def cli():
     print(f"Estimated cost without response: ${estimated_cost}")
     print("=================================================")
     print("Generating response...")
-    response = gpt.request()
+    stream = gpt.request()
+    response = ""
 
-    clean_res = clean_response(response)
-    cost = tokenizer.calculate_text_cost(response)
-    print(f"Cost: ${cost}")
+    for chunk in stream:
+        if chunk.choices[0].delta.content is not None:
+            chunk = clean_chunk(chunk)
+            animate_output(chunk)
+            response += chunk
+
+    print()
+
+    # cost = tokenizer.calculate_text_cost(stream)
+    # print(f"Cost: ${cost}")
     print("=================================================")
-    print("Response:")
-    animate_response(clean_res)
 
     if write_to_file_flag:
         with open(file_name, "w") as f:
-            f.write(clean_res)
+            f.write(response)
         print(f"Response written to {file_name}")
         clean_file(file_name)
 
@@ -101,21 +107,20 @@ def get_default_prompt():
         "content": content
     }
 
-def clean_response(response):
-    return response.choices[0].message.content.strip()
+def clean_chunk(chunk):
+    return chunk.choices[0].delta.content
 
 def clean_file(file_name):
     with open(file_name, 'r') as file:
         lines = file.readlines()
 
-    if len(lines) > 2:
+    if lines[0].startswith('```') and lines[-1].endswith('```'):
         with open(file_name, 'w') as arquivo:
             for line in lines[1:-1]:
                 arquivo.write(line)
-    else:
-        raise ValueError("O arquivo deve ter mais de duas linhas para remover a primeira e a última.")
+        print("File cleaned successfully")
 
-def animate_response(clean_res):
+def animate_output(clean_res):
     for c in clean_res:
         print(c, end='', flush=True)
         time.sleep(0.01)

@@ -20,7 +20,8 @@ class GPT:
             self.validate_model()
             return self.client.chat.completions.create(
                 model=self.model,
-                messages=self.messages
+                messages=self.messages,
+                stream=True
             )
         except Exception as e:
             print(e)
