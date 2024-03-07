@@ -85,8 +85,8 @@ def cli():
 
     print()
 
-    # cost = tokenizer.calculate_text_cost(stream)
-    # print(f"Cost: ${cost}")
+    cost = tokenizer.calculate_stream_cost(estimated_cost, response)
+    print(f"Cost: ${cost}")
     print("=================================================")
 
     if write_to_file_flag:
