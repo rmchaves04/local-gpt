@@ -74,7 +74,7 @@ def cli():
     print(f"Estimated cost without response: ${estimated_cost}")
     print("=================================================")
     print("Generating response...")
-    stream = gpt.request()
+    stream = gpt.request(stream=True)
     response = ""
 
     for chunk in stream:
@@ -106,6 +106,9 @@ def get_default_prompt():
         "role": "system",
         "content": content
     }
+
+def clean_response(response):
+    return response.choices[0].message.content.strip()
 
 def clean_chunk(chunk):
     return chunk.choices[0].delta.content
