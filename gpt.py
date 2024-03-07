@@ -15,12 +15,13 @@ class GPT:
             api_key=os.getenv("OPENAI_API_KEY")
         )
 
-    def request(self):
+    def request(self, stream=False):
         try:
             self.validate_model()
             return self.client.chat.completions.create(
                 model=self.model,
-                messages=self.messages
+                messages=self.messages,
+                stream=stream
             )
         except Exception as e:
             print(e)
