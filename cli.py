@@ -2,8 +2,24 @@ import time
 from typing import List, Tuple, Dict
 from models.gpt import GPT, MODELS
 from tokenizer import Tokenizer
+from model_factory import get_valid_models, get_ai_model
 
 # TODO: historico -> salva o historico da conversa atual num txt da vida, e depois le o txt e passa como parametro para o GPT
+
+
+def choose_ai():
+    valid_models = get_valid_models()
+    print("=================================")
+    print("Choose a valid AI Model:\n")
+    i = 1
+    for model in valid_models:
+        print(f"[i] {str(model)}")
+        i += 1
+    ai_choosen = int(input())
+    if ai_choosen < 1 or ai_choosen > len(valid_models):
+        print("Invalid choice.")
+        exit()
+    return get_ai_model(valid_models[i - 1])
 
 
 def cli():
