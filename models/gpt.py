@@ -7,8 +7,12 @@ from models.model import Model
 load_dotenv()
 
 
-MODELS = ["gpt-3.5-turbo-0125", "gpt-4",
-          "gpt-4-turbo-preview", "gpt-4-vision-preview"]
+VARIATIONS = [
+    "gpt-3.5-turbo-0125",
+    "gpt-4",
+    "gpt-4-turbo-preview",
+    "gpt-4-vision-preview",
+]
 
 
 class GPT(Model):
@@ -27,5 +31,8 @@ class GPT(Model):
             print(e)
 
     def validate_model(self):
-        if self.model not in MODELS:
+        if self.model not in VARIATIONS:
             raise ValueError("Invalid model name")
+
+    def get_model_variations(self):
+        return VARIATIONS
