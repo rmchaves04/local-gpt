@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request
-from models.gpt import GPT, MODELS
+from models.model_factory import get_ai_model, get_valid_models
+from models.gpt import GPT, VARIATIONS
 from tokenizer import Tokenizer
+
+MODELS = VARIATIONS
 
 
 def get_default_prompt():
