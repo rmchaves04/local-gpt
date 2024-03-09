@@ -1,34 +1,23 @@
 import time
 from typing import List, Tuple, Dict
-from models.gpt import GPT, MODELS
 from tokenizer import Tokenizer
-from model_factory import get_valid_models, get_ai_model
+from models.model_factory import get_valid_models, get_ai_model
 
 # TODO: historico -> salva o historico da conversa atual num txt da vida, e depois le o txt e passa como parametro para o GPT
-
-
-def choose_ai():
-    valid_models = get_valid_models()
-    print("=================================")
-    print("Choose a valid AI Model:\n")
-    i = 1
-    for model in valid_models:
-        print(f"[i] {str(model)}")
-        i += 1
-    ai_choosen = int(input())
-    if ai_choosen < 1 or ai_choosen > len(valid_models):
-        print("Invalid choice.")
-        exit()
-    return get_ai_model(valid_models[i - 1])
 
 
 def cli():
     print("=================================================")
     print("Welcome to GPT CLI")
     print("=================================================")
+
+    model_class = choose_model()
+    model = model_class("", [])
+    VARIATIONS = model.get_model_variations()
     print("Choose your model: ")
 
-    model = choose_model(MODELS)
+    model_variation = choose_model_variation(VARIATIONS)
+    model.set_model(model_variation)
     print("=================================================")
     write_to_file_flag, file_name = write_to_file_option()
     print("=================================================")
@@ -43,8 +32,8 @@ def cli():
     messages.append(user_prompt)
     print("=================================================")
 
-    gpt = GPT(model, messages)
-    tokenizer = Tokenizer(gpt)
+    model.set_messages(messages)
+    tokenizer = Tokenizer(model)
     print("Calculating tokens...")
     prompt_tokens = tokenizer.tokens_per_prompt()
     print(f"Prompt tokens: {prompt_tokens}")
@@ -53,7 +42,7 @@ def cli():
     print(f"Estimated cost without response: ${estimated_cost}")
     print("=================================================")
     print("Generating response...")
-    stream = gpt.request(stream=True)
+    stream = model.request(stream=True)
     response = ""
 
     for chunk in stream:
@@ -71,18 +60,33 @@ def cli():
     write_to_file(response, file_name, write_to_file_flag)
 
 
-def choose_model(models: List[str]) -> str:
+def choose_model():
+    valid_models = get_valid_models()
+    print("=================================")
+    print("Choose a valid AI Model:\n")
+    i = 1
+    for model in valid_models:
+        print(f"[{i}] {str(model)}")
+        i += 1
+    ai_choosen = int(input())
+    if ai_choosen < 1 or ai_choosen > len(valid_models):
+        print("Invalid choice.")
+        exit()
+    return get_ai_model(valid_models[ai_choosen - 1])
+
+
+def choose_model_variation(variations: List[str]) -> str:
     i = 0
-    for model in models:
-        print(f"{i}. {model}")
+    for variation in variations:
+        print(f"{i}. {variation}")
         i += 1
 
-    model = int(input("Choose a model: "))
-    if model < 0 or model > len(models) - 1:
+    variation = int(input("Choose a model: "))
+    if variation < 0 or variation > len(variations) - 1:
         print("Invalid model")
         exit()
-    print("You chose:", models[model])
-    return models[model]
+    print("You chose:", variations[variation])
+    return variations[variation]
 
 
 def write_to_file_option() -> Tuple[bool, str]:
