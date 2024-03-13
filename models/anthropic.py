@@ -15,17 +15,19 @@ class AnthropicAI(Model):
         self.messages = messages
         self.client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-    def request(self):
+    def request(self, stream=False):
         try:
             self.validate_model()
             system_prompt = self.messages[0]["content"]
-            self.messages.remove(0)
+            self.messages.pop(0)
+
             return self.client.messages.create(
                 model=self.model,
                 max_tokens=1000,
                 temperature=0.1,
                 system=system_prompt,
                 messages=self.messages,
+                stream=stream,
             )
         except Exception as e:
             print(e)
