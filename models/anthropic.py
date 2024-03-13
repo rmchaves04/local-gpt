@@ -1,4 +1,6 @@
 import os
+from typing import List, Dict
+from models.model import Model
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
@@ -16,29 +18,21 @@ class AnthropicAI(Model):
     def request(self):
         try:
             self.validate_model()
+            system_prompt = self.messages[0]["content"]
+            self.messages.remove(0)
             return self.client.messages.create(
-                model=model, max_tokens=1000, temperature=0.1
+                model=self.model,
+                max_tokens=1000,
+                temperature=0.1,
+                system=system_prompt,
+                messages=self.messages,
             )
         except Exception as e:
             print(e)
 
+    def validate_model(self):
+        if self.model not in VARIATIONS:
+            raise ValueError("Invalid model name")
 
-client = anthropic.Anthropic(os.env.get("anthropic_api_key"))
-message = client.messages.create(
-    model="claude-3-opus-20240229",
-    max_tokens=1000,
-    temperature=0,
-    system="You are a specialist in classic rock",
-    messages=[
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": "Name the top 5 best selling classic rock bands of all time",
-                }
-            ],
-        }
-    ],
-)
-print(message.content)
+    def get_model_variations(self):
+        return VARIATIONS
