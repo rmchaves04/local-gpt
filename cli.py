@@ -1,5 +1,6 @@
 import time
 from typing import List, Tuple, Dict
+from models.gpt import GPT
 from tokenizer import Tokenizer
 from models.model_factory import get_valid_models, get_ai_model
 
@@ -33,16 +34,20 @@ def cli():
     print("=================================================")
 
     model.set_messages(messages)
-    tokenizer = Tokenizer(model)
-    print("Calculating tokens...")
-    prompt_tokens = tokenizer.tokens_per_prompt()
-    print(f"Prompt tokens: {prompt_tokens}")
-    print("Estimating cost...")
-    estimated_cost = tokenizer.estimate_cost()
-    print(f"Estimated cost without response: ${estimated_cost}")
+    tokenizer = None
+    estimated_cost = None
+    if isinstance(model, GPT):
+        tokenizer = Tokenizer(model)
+        print("Calculating tokens...")
+        prompt_tokens = tokenizer.tokens_per_prompt()
+        print(f"Prompt tokens: {prompt_tokens}")
+        print("Estimating cost...")
+        estimated_cost = tokenizer.estimate_cost()
+        print(f"Estimated cost without response: ${estimated_cost}")
     print("=================================================")
     print("Generating response...")
     stream = model.request(stream=True)
+
     response = ""
 
     for chunk in stream:
@@ -53,8 +58,9 @@ def cli():
 
     print()
 
-    cost = tokenizer.calculate_stream_cost(estimated_cost, response)
-    print(f"Cost: ${cost}")
+    if isinstance(model, GPT) and tokenizer and estimated_cost:
+        cost = tokenizer.calculate_stream_cost(estimated_cost, response)
+        print(f"Cost: ${cost}")
     print("=================================================")
 
     write_to_file(response, file_name, write_to_file_flag)

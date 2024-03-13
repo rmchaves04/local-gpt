@@ -1,8 +1,7 @@
 from models.gpt import GPT
+from models.anthropic import AnthropicAI
 
-models = {
-    "GPT": GPT,
-}
+models = {"GPT": GPT, "Anthropic": AnthropicAI}
 
 
 def get_valid_models():
