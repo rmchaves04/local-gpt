@@ -6,9 +6,6 @@ from models.gpt import GPT
 from tokenizer import Tokenizer
 from models.model_factory import get_valid_models, get_ai_model
 
-# TODO: historico -> salva o historico da conversa atual num txt da vida, e depois le o txt e passa como parametro para o GPT
-
-
 def cli():
     print("=================================================")
     print("Welcome to GPT CLI")
@@ -33,6 +30,11 @@ def interactive_conversation_mode():
     print("YOU'RE NOW STARTING INTERACTIVE CONVERSATION MODE. TYPE 'exit' TO QUIT THE PROGRAM.")
     print("=================================================")
 
+    tokenizer = None
+    total_cost = 0
+    if isinstance(model, GPT):
+        tokenizer = Tokenizer(model)
+
     while True:
         user_prompt = input("You: ")
         print()
@@ -54,14 +56,21 @@ def interactive_conversation_mode():
 
         print('\n')
 
+        if isinstance(model, GPT) and tokenizer:
+            total_cost += tokenizer.calculate_stream_cost(response)
         model.messages.append({"role": "assistant", "content": response})
+
+    if isinstance(model, GPT) and tokenizer:
+        print("=================================================")
+        total_cost += tokenizer.estimate_cost()
+        print(f"Total conversation cost: {total_cost}")
 
     print("=================================================")
     print("Would you like to save this chatlog to a file? [Y/n] (default: n)")
     save_chatlog = input()
     if save_chatlog.lower() == "y":
         file_name = input("Write the file name: ")
-        write_interactive_chat_to_file(model.messages, file_name)
+        write_interactive_chat_to_file(model.model, model.messages, file_name, total_cost)
         print(f"Chatlog written to {file_name}")
 
 
@@ -108,11 +117,11 @@ def one_prompt_mode():
     print()
 
     if isinstance(model, GPT) and tokenizer and estimated_cost:
-        cost = tokenizer.calculate_stream_cost(estimated_cost, response)
+        cost = estimated_cost + tokenizer.calculate_stream_cost(response)
         print(f"Cost: ${cost}")
     print("=================================================")
 
-    write_to_file(response, file_name, write_to_file_flag)
+    write_to_file(model.model, response, file_name, write_to_file_flag)
 
 
 def ask_usage_mode():

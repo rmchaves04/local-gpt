@@ -47,15 +47,14 @@ class Tokenizer:
         total_cost = input_cost + output_cost
         return total_cost
 
-    def calculate_stream_cost(self, input_cost, response) -> float:
+    def calculate_stream_cost(self, response) -> float:
         response_tokens = self.tokens_per_string(response)
 
-        output_cost = (response_tokens / 1000) * self.prices_per_thousand_tokens[
+        stream_cost = (response_tokens / 1000) * self.prices_per_thousand_tokens[
             self.gpt.model
         ]["output"]
 
-        total_cost = input_cost + output_cost
-        return total_cost
+        return stream_cost
 
     def estimate_cost(self):
         return (self.tokens_per_prompt() / 1000) * self.prices_per_thousand_tokens[
