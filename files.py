@@ -12,7 +12,6 @@ def write_to_file_option() -> Tuple[bool, str]:
         file_name = input()
     return write_to_file_flag, file_name
 
-
 def write_to_file(model_name, response, file_name, write_to_file_flag):
     if write_to_file_flag:
         with open(file_name, "w") as f:
