@@ -1,4 +1,4 @@
-from files import write_to_file, write_to_file_option
+from files import write_to_file, write_to_file_option, write_interactive_chat_to_file
 from response import clean_chunk, animate_output, clean_response
 from prompts import get_system_prompt, get_user_prompt
 from typing import List
@@ -56,7 +56,13 @@ def interactive_conversation_mode():
 
         model.messages.append({"role": "assistant", "content": response})
 
-    exit()
+    print("=================================================")
+    print("Would you like to save this chatlog to a file? [Y/n] (default: n)")
+    save_chatlog = input()
+    if save_chatlog.lower() == "y":
+        file_name = input("Write the file name: ")
+        write_interactive_chat_to_file(model.messages, file_name)
+        print(f"Chatlog written to {file_name}")
 
 
     

@@ -19,6 +19,12 @@ def write_to_file(response, file_name, write_to_file_flag):
         print(f"Response written to {file_name}")
         clean_file(file_name)
 
+def write_interactive_chat_to_file(messages, file_name):
+    with open(file_name, "w") as f:
+        f.write(f"SYSTEM PROMPT: {messages[0]['content']}\n")
+        for message in messages[1:]:
+            f.write(f"{message['role']}: {message['content']}\n")
+
 def clean_file(file_name):
     with open(file_name, "r") as file:
         lines = file.readlines()
