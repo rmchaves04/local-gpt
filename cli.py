@@ -1,7 +1,7 @@
-import time
-from replies import ask_usage_mode, format_user_prompt
+from files import write_to_file, write_to_file_option
+from response import clean_chunk, animate_output, clean_response
 from prompts import get_system_prompt, get_user_prompt
-from typing import List, Tuple
+from typing import List
 from models.gpt import GPT
 from tokenizer import Tokenizer
 from models.model_factory import get_valid_models, get_ai_model
@@ -24,12 +24,7 @@ def cli():
 
 
 def interactive_conversation_mode():
-    model_class = choose_model()
-    model = model_class("", [])
-    VARIATIONS = model.get_model_variations()
-    print("Choose your model: ")
-    model_variation = choose_model_variation(VARIATIONS)
-    model.set_model(model_variation)
+    model = prepare_model()
     print("=================================================")
     model.set_messages([])
     system_prompt = get_system_prompt()
@@ -66,13 +61,7 @@ def interactive_conversation_mode():
 
     
 def one_prompt_mode():
-    model_class = choose_model()
-    model = model_class("", [])
-    VARIATIONS = model.get_model_variations()
-    print("Choose your model: ")
-
-    model_variation = choose_model_variation(VARIATIONS)
-    model.set_model(model_variation)
+    model = prepare_model()
     print("=================================================")
     write_to_file_flag, file_name = write_to_file_option()
     print("=================================================")
@@ -134,6 +123,16 @@ def ask_usage_mode():
     
     return mode
 
+def prepare_model():
+    model_class = choose_model()
+    model = model_class("", [])
+    VARIATIONS = model.get_model_variations()
+    print("Choose your model: ")
+
+    model_variation = choose_model_variation(VARIATIONS)
+    model.set_model(model_variation)
+
+    return model
 
 def choose_model():
     valid_models = get_valid_models()
@@ -162,50 +161,5 @@ def choose_model_variation(variations: List[str]) -> str:
         exit()
     print("You chose:", variations[variation])
     return variations[variation]
-
-
-def write_to_file_option() -> Tuple[bool, str]:
-    write_to_file_flag = False
-    print("Do you want to write the response to a file? [Y/n] (default: n)")
-    write_to_file = input()
-    file_name = None
-    if write_to_file.lower() == "y":
-        write_to_file_flag = True
-        print("Write the file name:")
-        file_name = input()
-    return write_to_file_flag, file_name
-
-
-def write_to_file(response, file_name, write_to_file_flag):
-    if write_to_file_flag:
-        with open(file_name, "w") as f:
-            f.write(response)
-        print(f"Response written to {file_name}")
-        clean_file(file_name)
-
-
-def clean_response(response):
-    return response.choices[0].message.content.strip()
-
-
-def clean_chunk(chunk):
-    return chunk.choices[0].delta.content
-
-
-def clean_file(file_name):
-    with open(file_name, "r") as file:
-        lines = file.readlines()
-
-    if lines[0].startswith("```") and lines[-1].endswith("```"):
-        with open(file_name, "w") as arquivo:
-            for line in lines[1:-1]:
-                arquivo.write(line)
-        print("File cleaned successfully")
-
-
-def animate_output(clean_res):
-    for c in clean_res:
-        print(c, end="", flush=True)
-        time.sleep(0.01)
 
 cli()
