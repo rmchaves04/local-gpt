@@ -1,5 +1,7 @@
 import time
-from typing import List, Tuple, Dict
+from replies import ask_usage_mode, format_user_prompt
+from prompts import get_system_prompt, get_user_prompt
+from typing import List, Tuple
 from models.gpt import GPT
 from tokenizer import Tokenizer
 from models.model_factory import get_valid_models, get_ai_model
@@ -12,6 +14,58 @@ def cli():
     print("Welcome to GPT CLI")
     print("=================================================")
 
+    print("Choose your usage mode")
+    usage_mode = ask_usage_mode()
+
+    if usage_mode == 1:
+        one_prompt_mode()
+    else:
+        interactive_conversation_mode()
+
+
+def interactive_conversation_mode():
+    model_class = choose_model()
+    model = model_class("", [])
+    VARIATIONS = model.get_model_variations()
+    print("Choose your model: ")
+    model_variation = choose_model_variation(VARIATIONS)
+    model.set_model(model_variation)
+    print("=================================================")
+    model.set_messages([])
+    system_prompt = get_system_prompt()
+    model.messages.append(system_prompt)
+    print("=================================================")
+    print("YOU'RE NOW STARTING INTERACTIVE CONVERSATION MODE. TYPE 'exit' TO QUIT THE PROGRAM.")
+    print("=================================================")
+
+    while True:
+        user_prompt = input("You: ")
+        print()
+
+        if user_prompt.lower() == "exit":
+            break
+
+        model.messages.append({"role": "user", "content": user_prompt})
+        stream = model.request(stream=True)
+
+        response = ""
+
+        print("GPT: ", end='')
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                chunk = clean_chunk(chunk)
+                animate_output(chunk)
+                response += chunk
+
+        print('\n')
+
+        model.messages.append({"role": "assistant", "content": response})
+
+    exit()
+
+
+    
+def one_prompt_mode():
     model_class = choose_model()
     model = model_class("", [])
     VARIATIONS = model.get_model_variations()
@@ -29,7 +83,7 @@ def cli():
     messages.append(system_prompt)
     print("=================================================")
 
-    user_prompt = get_prompt()
+    user_prompt = get_user_prompt()
     messages.append(user_prompt)
     print("=================================================")
 
@@ -64,6 +118,21 @@ def cli():
     print("=================================================")
 
     write_to_file(response, file_name, write_to_file_flag)
+
+
+def ask_usage_mode():
+    modes = ["One Prompt Mode", "Interactive Conversation Mode"]
+    
+    i = 1
+    for mode in modes:
+        print(f"[{i}] {mode}")
+        i += 1
+    mode = int(input())
+
+    if mode < 1 or mode > len(modes):
+        raise ValueError("Invalid mode")
+    
+    return mode
 
 
 def choose_model():
@@ -107,45 +176,12 @@ def write_to_file_option() -> Tuple[bool, str]:
     return write_to_file_flag, file_name
 
 
-def get_system_prompt() -> Dict:
-    print("Do you want to write a system prompt? [Y/n] (default: n)")
-    prompt = input()
-    if prompt.lower() == "y":
-        print("Write your system prompt:")
-        return {"role": "system", "content": input()}
-    else:
-        return get_default_prompt()
-
-
-def get_prompt() -> Dict:
-    print("Do you want us to read the prompt from a file? [Y/n] (default: n)")
-    read_from_file = input()
-    if read_from_file.lower() == "y":
-        print("Write the file name:")
-        file_name = input()
-        with open(file_name, "r") as f:
-            return {"role": "user", "content": f.read()}
-    else:
-        print("=================================================")
-        print("Write your user prompt:")
-        return {"role": "user", "content": input()}
-
-
 def write_to_file(response, file_name, write_to_file_flag):
     if write_to_file_flag:
         with open(file_name, "w") as f:
             f.write(response)
         print(f"Response written to {file_name}")
         clean_file(file_name)
-
-
-def get_default_prompt():
-    content = ""
-
-    with open("default_sys_prompt.txt") as f:
-        content = f.read()
-
-    return {"role": "system", "content": content}
 
 
 def clean_response(response):
@@ -171,6 +207,5 @@ def animate_output(clean_res):
     for c in clean_res:
         print(c, end="", flush=True)
         time.sleep(0.01)
-
 
 cli()
