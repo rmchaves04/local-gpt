@@ -8,7 +8,8 @@ Local GPT is a Python CLI and GUI tool that makes requests to OpenAI's models us
 - Cost estimation using `tiktoken`
 - Customizable system prompts (the default prompt is inside `default_sys_prompt.txt`)
 - Reading inputs from files
-- Writing outputs to files
+- Writing outputs and chat logs to files
+- Interactive chat mode: Ask follow up questions based on previous assistant answers, maintaining context
 
 ### Installation guide
 To get started using Local GPT, simply clone the repository and install the requirements.
