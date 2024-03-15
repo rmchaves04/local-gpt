@@ -1,6 +1,6 @@
 import os
 from typing import List, Dict
-from models.model import Model
+from models.model import Model, ModelTokenizer
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
@@ -38,3 +38,16 @@ class AnthropicAI(Model):
 
     def get_model_variations(self):
         return VARIATIONS
+
+    def get_tokenizer(self):
+        return AnthropicTokenizer(self.model)
+
+
+class AnthropicTokenizer(ModelTokenizer):
+    def __init__(self, anthropic):
+        super().__init__(anthropic)
+        self.prices_per_thousand_tokens = {}
+        assert self.anthropic.model in self.prices_per_thousand_tokens, "Model not found in the price table."
+        
+
+
