@@ -4,6 +4,7 @@ from openai import OpenAI
 from typing import List, Dict
 from dotenv import load_dotenv
 from models.model import Model, ModelTokenizer
+from response import animate_output, clean_chunk
 
 load_dotenv()
 
@@ -34,6 +35,15 @@ class GPT(Model):
     def validate_model(self):
         if self.model not in VARIATIONS:
             raise ValueError("Invalid model name")
+
+    def stream_response(self, stream):
+        response = ""
+        for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                chunk = clean_chunk(chunk)
+                animate_output(chunk)
+                response += chunk
+        return response
 
     def get_model_variations(self):
         return VARIATIONS
@@ -77,10 +87,10 @@ class GptTokenizer(ModelTokenizer):
         total_cost = input_cost + output_cost
         return total_cost
 
-    def calculate_stream_cost(self, response):
-        response_tokens = self.tokens_per_string(
-            response.get("response")
-        ) + self.tokens_per_string(response.get("user_prompt"))
+    def calculate_stream_cost(self, response, user_prompt):
+        response_tokens = self.tokens_per_string(response) + self.tokens_per_string(
+            user_prompt
+        )
 
         stream_cost = (response_tokens / 1000) * self.prices_per_thousand_tokens[
             self.model
