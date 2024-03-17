@@ -4,6 +4,7 @@ from prompts import get_system_prompt, get_user_prompt
 from typing import List
 from models.model_factory import get_valid_models, get_ai_model
 
+
 def cli():
     print("=================================================")
     print("Welcome to GPT CLI")
@@ -25,7 +26,9 @@ def interactive_conversation_mode():
     system_prompt = get_system_prompt()
     model.messages.append(system_prompt)
     print("=================================================")
-    print("YOU'RE NOW STARTING INTERACTIVE CONVERSATION MODE. TYPE 'exit' TO QUIT THE PROGRAM.")
+    print(
+        "YOU'RE NOW STARTING INTERACTIVE CONVERSATION MODE. TYPE 'exit' TO QUIT THE PROGRAM."
+    )
     print("=================================================")
 
     tokenizer = model.get_tokenizer()
@@ -43,16 +46,11 @@ def interactive_conversation_mode():
 
         response = ""
 
-        print("Assistant: ", end='')
-        for chunk in stream:
-            if chunk.choices[0].delta.content is not None:
-                chunk = clean_chunk(chunk)
-                animate_output(chunk)
-                response += chunk
+        print("Assistant: ", end="")
+        response = model.stream_response(stream)
+        print("\n")
 
-        print('\n')
-
-        total_cost += tokenizer.calculate_stream_cost(response)
+        total_cost += tokenizer.calculate_stream_cost(response, user_prompt)
         model.messages.append({"role": "assistant", "content": response})
 
     print("=================================================")
@@ -60,11 +58,13 @@ def interactive_conversation_mode():
     save_chatlog = input()
     if save_chatlog.lower() == "y":
         file_name = input("Write the file name: ")
-        write_interactive_chat_to_file(model.model, model.messages, file_name, total_cost)
+        write_interactive_chat_to_file(
+            model.model, model.messages, file_name, total_cost
+        )
         print(f"Chatlog written to {file_name}")
+    print("Total cost: ${:10.6f}".format(total_cost))
 
 
-    
 def one_prompt_mode():
     model = prepare_model()
     print("=================================================")
@@ -90,15 +90,10 @@ def one_prompt_mode():
     response = ""
     user_msg = messages[0].get("content") + messages[1].get("content")
 
-    for chunk in stream:
-        if chunk.choices[0].delta.content is not None:
-            chunk = clean_chunk(chunk)
-            animate_output(chunk)
-            response += chunk
-
+    response = model.stream_response(stream)
     print()
 
-    entire_prompt = { "response": response, "user_prompt": user_msg }
+    entire_prompt = {"response": response, "user_prompt": user_msg}
     cost = tokenizer.calculate_stream_cost(entire_prompt)
     print(f"Cost: ${cost}")
     print("=================================================")
@@ -108,7 +103,7 @@ def one_prompt_mode():
 
 def ask_usage_mode():
     modes = ["One Prompt Mode", "Interactive Conversation Mode"]
-    
+
     i = 1
     for mode in modes:
         print(f"[{i}] {mode}")
@@ -117,8 +112,9 @@ def ask_usage_mode():
 
     if mode < 1 or mode > len(modes):
         raise ValueError("Invalid mode")
-    
+
     return mode
+
 
 def prepare_model():
     model_class = choose_model()
@@ -130,6 +126,7 @@ def prepare_model():
     model.set_model(model_variation)
 
     return model
+
 
 def choose_model():
     valid_models = get_valid_models()
@@ -158,5 +155,6 @@ def choose_model_variation(variations: List[str]) -> str:
         exit()
     print("You chose:", variations[variation])
     return variations[variation]
+
 
 cli()
