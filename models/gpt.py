@@ -51,11 +51,13 @@ class GptTokenizer(ModelTokenizer):
             "gpt-4-turbo-preview": {"input": 0.01, "output": 0.03},
             "gpt-4-vision-preview": {"input": 0.01, "output": 0.03},
         }
-        assert self.gpt.model in self.prices_per_thousand_tokens, "Model not found in the price table"
+        assert (
+            self.model in self.prices_per_thousand_tokens
+        ), "Model not found in the price table"
         self.encoding = self.get_encoding()
 
     def get_encoding(self) -> str:
-        return tiktoken.encoding_for_model(self.gpt.model)
+        return tiktoken.encoding_for_model(self.model)
 
     def tokens_per_string(self, string: str) -> int:
         encoded_str = self.encoding.encode(string)
@@ -66,21 +68,22 @@ class GptTokenizer(ModelTokenizer):
         completion_tokens = response.usage.completion_tokens
 
         input_cost = (prompt_tokens / 1000) * self.prices_per_thousand_tokens[
-            self.gpt.model
+            self.model
         ]["input"]
         output_cost = (completion_tokens / 1000) * self.prices_per_thousand_tokens[
-            self.gpt.model
+            self.model
         ]["output"]
 
         total_cost = input_cost + output_cost
         return total_cost
 
     def calculate_stream_cost(self, response):
-        response_tokens = self.tokens_per_string(response.get(
-            "reponse")) + self.tokens_per_string(response.get("user_prompt"))
+        response_tokens = self.tokens_per_string(
+            response.get("response")
+        ) + self.tokens_per_string(response.get("user_prompt"))
 
         stream_cost = (response_tokens / 1000) * self.prices_per_thousand_tokens[
-            self.gpt.model
+            self.model
         ]["output"]
 
         return stream_cost
