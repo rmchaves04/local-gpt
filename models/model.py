@@ -19,11 +19,25 @@ class Model:
     def get_model_variations(self) -> List[str]:
         raise ShouldImplement
 
+    def get_tokenizer(self):
+        return ModelTokenizer(self.model)
+
     def set_model(self, model: str):
         self.model = model
 
     def set_messages(self, messages: List[Dict]):
         self.messages = messages
+
+class ModelTokenizer:
+    def __init__(self, model):
+        self.model = model
+        self.prices_per_thousand_tokens = {}
+
+    def calculate_text_cost(self, response):
+        raise ShouldImplement
+
+    def calculate_stream_cost(self, response):
+        raise ShouldImplement
 
 
 class ShouldImplement(Exception):
